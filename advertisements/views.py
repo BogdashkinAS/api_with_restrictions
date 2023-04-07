@@ -16,8 +16,6 @@ class AdvertisementViewSet(ModelViewSet):
     
     queryset = Advertisement.objects.all()
     serializer_class = AdvertisementSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
-    filterset_fields = ['creator', 'created_at']
     filter_backends = [DjangoFilterBackend]
     filterset_class = AdvertisementFilter
     
@@ -25,12 +23,12 @@ class AdvertisementViewSet(ModelViewSet):
     def get_permissions(self):
         
         """Получение прав для действий."""
+        if self.request.method == 'POST':
+            return [IsAuthenticated(), IsOwnerOrReadOnly()]
         if self.request.method == 'PATCH':
             return [IsAuthenticated(), IsOwnerOrReadOnly()]
         if self.request.method == 'DELETE':
             return [IsAuthenticated(), IsOwnerOrReadOnly()]
-        if self.action in ["create", "update", "partial_update"]:
-            return [IsAuthenticated()]
         return []
     
    

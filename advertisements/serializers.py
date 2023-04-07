@@ -47,12 +47,12 @@ class AdvertisementSerializer(serializers.ModelSerializer):
 
         data["creator"] = self.context["request"].user
         adv_count = Advertisement.objects.filter(creator=data["creator"].id, status="OPEN").count()
-        if adv_count >= 10 and 'POST' in str(self.context["request"]):
+        if adv_count >= 10 and self.context["request"].method == 'POST':
             raise ValidationError('Максимальное количество открытых объявлений')
-        if adv_count >= 10 and 'PATCH' in str(self.context["request"]):
-            if 'OPEN' in str(data):
+        if adv_count >= 10 and self.context["request"].method == 'PATCH':
+            if data.get('status') == 'OPEN':
                 raise ValidationError('Количество открытых объявлений не может быть больше 3')
-        if 'CLOSED' in str(data) and 'PATCH' in str(self.context["request"]):
+        if data.get('status') == 'CLOSED' and self.context["request"].method == 'PATCH':
             return data
         
         return data
